@@ -1,0 +1,9 @@
+{
+  "name": "babel-microgame-yejian-qidao",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test src/state/yejian_qidao_engine.test.js src/ui/yejian_qidao_controller.test.js"
+  }
+}

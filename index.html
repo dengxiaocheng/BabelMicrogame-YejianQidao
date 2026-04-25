@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>夜间祈祷</title>
+  <style>
+    :root { --bg:#151821; --fg:#ece7d8; --accent:#c9a227; --card:#22283a; --border:#39415c; --danger:#c0392b; --success:#27ae60; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center; background:radial-gradient(circle at top,#30384f,var(--bg)); color:var(--fg); font-family:"Noto Serif SC","Songti SC",serif; }
+    #app { width:min(680px,100%); padding:2rem; }
+    #status-bar { display:flex; gap:1rem; flex-wrap:wrap; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:.8rem; margin-bottom:1.5rem; }
+    #event-title { color:var(--accent); font-weight:bold; margin-bottom:.8rem; }
+    #narrative { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:1.4rem; min-height:120px; line-height:1.8; white-space:pre-wrap; margin-bottom:1.4rem; }
+    #choices { display:flex; flex-direction:column; gap:.6rem; }
+    .choice-btn { background:var(--card); border:1px solid var(--border); color:var(--fg); padding:.8rem 1rem; border-radius:4px; cursor:pointer; text-align:left; font:inherit; }
+    .choice-btn:hover:not(:disabled), .choice-btn.selected { border-color:var(--accent); background:rgba(201,162,39,.12); }
+    .choice-btn:disabled { opacity:.4; cursor:default; }
+    .continue-prompt { text-align:center; color:var(--accent); border:1px dashed var(--border); padding:.8rem; cursor:pointer; }
+    #feedback { margin-top:1.2rem; padding:1rem; border-left:3px solid var(--accent); background:rgba(201,162,39,.08); line-height:1.7; }
+    #ending { text-align:center; padding:2rem; }
+    #ending.success h2 { color:var(--success); }
+    #ending.failure h2 { color:var(--danger); }
+  </style>
+</head>
+<body>
+  <main id="app">
+    <h1>夜间祈祷</h1>
+    <div id="status-bar">
+      <span id="s-night"></span>
+      <span id="s-phase"></span>
+      <span id="s-spirit"></span>
+      <span id="s-suspicion"></span>
+      <span id="s-faith"></span>
+    </div>
+    <div id="phase-transition"></div>
+    <div id="event-title"></div>
+    <div id="narrative">加载中...</div>
+    <div id="choices"></div>
+    <div id="feedback" style="display:none"></div>
+    <div id="ending" style="display:none"><h2 id="ending-title"></h2><p id="ending-text"></p></div>
+  </main>
+  <script type="module">
+    import { NightPrayerController } from "./src/ui/yejian_qidao_controller.js";
+    import { NightPrayerRenderer } from "./src/ui/yejian_qidao_renderer.js";
+
+    const [config, characters, events] = await Promise.all([
+      fetch("src/content/yejian_qidao_config.json").then((r) => r.json()),
+      fetch("src/content/yejian_qidao_characters.json").then((r) => r.json()),
+      fetch("src/content/yejian_qidao_events.json").then((r) => r.json()),
+    ]);
+
+    const renderer = new NightPrayerRenderer({
+      night: document.getElementById("s-night"),
+      phase: document.getElementById("s-phase"),
+      spirit: document.getElementById("s-spirit"),
+      suspicion: document.getElementById("s-suspicion"),
+      faith: document.getElementById("s-faith"),
+      eventTitle: document.getElementById("event-title"),
+      narrative: document.getElementById("narrative"),
+      choices: document.getElementById("choices"),
+      feedback: document.getElementById("feedback"),
+      ending: document.getElementById("ending"),
+      endingTitle: document.getElementById("ending-title"),
+      endingText: document.getElementById("ending-text"),
+      phaseTransition: document.getElementById("phase-transition"),
+    });
+    new NightPrayerController(renderer, { config, characters, events }).start();
+  </script>
+</body>
+</html>
